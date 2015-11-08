@@ -6,7 +6,6 @@ import tempfile
 import subprocess
 import shlex
 import datetime
-import logging
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 
@@ -81,7 +80,7 @@ class GitHubRepo(object):
         # send pull request
         cmd = 'hub pull-request -m "{0}" -h {1}:{2} -b {3}:{4}'\
             .format(commit_msg, self.github_user, branch,
-                    owner, default_branch)
+                    self.owner, self.default_branch)
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
         self.empty_prs.append((branch, commit_sha))
 
@@ -89,6 +88,7 @@ class GitHubRepo(object):
         for br, sha in self.empty_prs:
             if self.check_ci_status(sha) == 'success':
                 cmd = 'git push {0} {1} --delete'.format(self.github_user, br)
+                subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
 
 
 class GitHubReposHandler(object):
@@ -109,7 +109,6 @@ class GitHubReposHandler(object):
 
 
 def main():
-    logging.basicConfig()
     repo_slugs = ['start-jsk/jsk_apc']
     gh_repos_handler = GitHubReposHandler(repo_slugs)
     scheduler = BlockingScheduler()
