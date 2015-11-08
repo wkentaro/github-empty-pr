@@ -21,6 +21,7 @@ class GitHubRepo(object):
         self.repo_dir = os.path.join(tmpdir, repo)
         self.default_branch = self.get_current_branch()
         self.github_user = os.environ['GITHUB_USER']
+        self.github_token = os.environ['GITHUB_TOKEN']
         self.setup_remote()
 
     def clone(self, cwd):
@@ -37,8 +38,10 @@ class GitHubRepo(object):
                 return br.split()[-1]
 
     def setup_remote(self):
-        cmd = 'git remote add {0} git@github.com:{1}/{2}.git'\
-            .format(self.github_user, self.github_user, self.repo)
+        url = 'https://{token}@github.com/{user}/{repo}.git'.format(
+            user=self.github_user, token=self.github_token, repo=self.repo)
+        cmd = 'git remote add {user} {url}'\
+            .format(user=self.github_user, url=url)
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
 
     def check_ci_status(self, commit_sha):
