@@ -5,8 +5,13 @@ import os
 import subprocess
 import shlex
 import datetime
+import logging
 
 from apscheduler.schedulers.blocking import BlockingScheduler
+
+
+logger = logging.getLogger('github_empty_pr')
+logger.setLevel(logging.DEBUG)
 
 
 _THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -116,7 +121,7 @@ class GitHubReposHandler(object):
 def main():
     repo_slugs = ['start-jsk/jsk_apc']
     gh_repos_handler = GitHubReposHandler(repo_slugs)
-    scheduler = BlockingScheduler()
+    scheduler = BlockingScheduler(logger=logger)
     scheduler.add_job(gh_repos_handler.send_empty_pr,
                       trigger='interval', minutes=5)
     scheduler.add_job(gh_repos_handler.close_ci_success_empty_pr,
