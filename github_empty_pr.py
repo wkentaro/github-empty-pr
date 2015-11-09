@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import tempfile
 import subprocess
 import shlex
 import datetime
@@ -10,7 +9,8 @@ import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 
-HUB = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hub')
+_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+HUB = os.path.join(_THIS_DIR, 'hub')
 
 
 class GitHubRepo(object):
@@ -19,9 +19,8 @@ class GitHubRepo(object):
         self.owner = owner
         self.repo = repo
         self.empty_prs = []
-        tmpdir = tempfile.mkdtemp(suffix='github_repo')
-        self.clone(cwd=tmpdir)
-        self.repo_dir = os.path.join(tmpdir, repo)
+        self.clone(cwd=_THIS_DIR)
+        self.repo_dir = os.path.join(_THIS_DIR, repo)
         self.default_branch = self.get_current_branch()
         self.github_user = os.environ['GITHUB_USER']
         self.github_token = os.environ['GITHUB_TOKEN']
