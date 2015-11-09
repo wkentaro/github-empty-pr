@@ -116,9 +116,9 @@ def main():
     gh_repos_handler = GitHubReposHandler(repo_slugs)
     scheduler = BlockingScheduler()
     scheduler.add_job(gh_repos_handler.send_empty_pr,
-                      trigger='interval', days=1)
+                      trigger='interval', minutes=5)
     scheduler.add_job(gh_repos_handler.close_ci_success_empty_pr,
-                      trigger='interval', hours=1)
+                      trigger='interval', minutes=5)
     scheduler.print_jobs()
     scheduler.start()
 
