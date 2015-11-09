@@ -10,6 +10,9 @@ import datetime
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 
+HUB = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'hub')
+
+
 class GitHubRepo(object):
 
     def __init__(self, owner, repo):
@@ -45,7 +48,7 @@ class GitHubRepo(object):
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
 
     def check_ci_status(self, commit_sha):
-        cmd = 'hub ci-status {0}'.format(commit_sha)
+        cmd = '{0} ci-status {1}'.format(HUB, commit_sha)
         output = subprocess.check_output(
             shlex.split(cmd), cwd=self.repo_dir).strip()
         return output
@@ -81,8 +84,8 @@ class GitHubRepo(object):
         cmd = 'git push {0} {1}'.format(self.github_user, branch)
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
         # send pull request
-        cmd = 'hub pull-request -m "{0}" -h {1}:{2} -b {3}:{4}'\
-            .format(commit_msg, self.github_user, branch,
+        cmd = '{0} pull-request -m "{1}" -h {2}:{3} -b {4}:{5}'\
+            .format(HUB, commit_msg, self.github_user, branch,
                     self.owner, self.default_branch)
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
         self.empty_prs.append((branch, commit_sha))
