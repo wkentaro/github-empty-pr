@@ -21,6 +21,7 @@ HUB = os.path.join(_THIS_DIR, 'hub')
 class GitHubRepo(object):
 
     def __init__(self, owner, repo):
+        print('initializing')
         self.owner = owner
         self.repo = repo
         self.empty_prs = []
@@ -30,6 +31,7 @@ class GitHubRepo(object):
         self.github_user = os.environ['GITHUB_USER']
         self.github_token = os.environ['GITHUB_TOKEN']
         self.setup_remote()
+        print('initialization done')
 
     def clone(self, cwd):
         cmd = 'git clone https://github.com/{0}/{1}.git'\
