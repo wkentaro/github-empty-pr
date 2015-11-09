@@ -21,7 +21,7 @@ HUB = os.path.join(_THIS_DIR, 'hub')
 class GitHubRepo(object):
 
     def __init__(self, owner, repo):
-        print('initializing')
+        logger.info('initializing')
         self.owner = owner
         self.repo = repo
         self.empty_prs = []
@@ -31,7 +31,7 @@ class GitHubRepo(object):
         self.github_user = os.environ['GITHUB_USER']
         self.github_token = os.environ['GITHUB_TOKEN']
         self.setup_remote()
-        print('initialization done')
+        logger.info('initialization done')
 
     def clone(self, cwd):
         cmd = 'git clone https://github.com/{0}/{1}.git'\
@@ -78,27 +78,34 @@ class GitHubRepo(object):
 
     def send_empty_pr(self):
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+        logger.debug('timestamp: {0}'.format(timestamp))
         # update cached remote branch
+        logger.info('fetching all')
         self.fetch_all()
         cmd = 'git checkout origin/{0}'.format(self.default_branch)
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
         # empty commit
+        logger.info('empty committing')
         branch = 'empty-commit-{0}'.format(timestamp)
         commit_msg = 'Empty commit for Travis test at {0}'.format(timestamp)
         commit_sha = self.commit_empty(branch, commit_msg)
         # push
+        logger.info('pushing to remote')
         cmd = 'git push {0} {1}'.format(self.github_user, branch)
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
         # send pull request
+        logger.info('sending pull request')
         cmd = '{0} pull-request -m "{1}" -h {2}:{3} -b {4}:{5}'\
             .format(HUB, commit_msg, self.github_user, branch,
                     self.owner, self.default_branch)
         subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
         self.empty_prs.append((branch, commit_sha))
+        logger.info('send_empty_pr done')
 
     def close_ci_success_empty_pr(self):
         for br, sha in self.empty_prs:
             if self.check_ci_status(sha) == 'success':
+                logger.info('closing {0}'.format(br))
                 cmd = 'git push {0} {1} --delete'.format(self.github_user, br)
                 subprocess.call(shlex.split(cmd), cwd=self.repo_dir)
 
