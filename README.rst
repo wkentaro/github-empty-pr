@@ -9,4 +9,4 @@ Usage
 =====
 
 #. Deploy this on heroku.
-#. Set ``GITHUB_TOKEN`` environmental variable at `dashboard <dashboard.heroku.com/apps>`_. It's generated from `here <https://github.com/settings/tokens>`_.
+#. Set ``GITHUB_TOKEN`` environmental variable at `dashboard <https://dashboard.heroku.com/apps>`_. It's generated from `here <https://github.com/settings/tokens>`_.
